@@ -16,26 +16,26 @@ export default function Signup() {
     setLoading(true);
 
     try {
-      const { data, error: signupError } = await supabase.auth.signUp({ email, password });
+      const { data, error: signupError } = await supabase.auth.signUp({
+        email,
+        password,
+        options: {
+          data: {
+            full_name: fullName,
+          },
+        },
+      });
 
       if (signupError) {
-        setError(signupError.message);
+        setError(`Signup Error: ${signupError.message}`);
         return;
       }
 
-      if (data.user) {
-        const { error: profileError } = await supabase.from('profiles').insert({
-          id: data.user.id,
-          full_name: fullName,
-        });
-
-        if (profileError) {
-          setError(profileError.message);
-        } else {
-          setMessage('Signup successful! Please check your email to confirm your account.');
-        }
-      }
+      setMessage(
+        'Signup successful! Please check your email to confirm your account before logging in.'
+      );
     } catch (err) {
+      console.error('Unexpected error during signup:', err);
       setError('An unexpected error occurred. Please try again.');
     } finally {
       setLoading(false);
@@ -52,7 +52,7 @@ export default function Signup() {
           <form onSubmit={(e) => {
               e.preventDefault();
               if (!loading) handleSignup();
-            }} >
+            }}>
             <div className="mb-4">
               <label htmlFor="fullName" className="block text-brand-dark mb-2">Full Name</label>
               <input type="text" id="fullName" placeholder="John Doe" value={fullName}
@@ -62,24 +62,25 @@ export default function Signup() {
             <div className="mb-4">
               <label htmlFor="email" className="block text-brand-dark mb-2">Email Address</label>
               <input type="email" id="email" placeholder="john.doe@example.com" value={email}
-                onChange={(e) => setEmail(e.target.value)}
-                className="w-full px-4 py-2 border border-brand-gray rounded-lg focus:outline-none focus:border-brand-bronze" required/>
+                onChange={(e) => setEmail(e.target.value)} 
+                className="w-full px-4 py-2 border border-brand-gray rounded-lg focus:outline-none focus:border-brand-bronze"  required/>
             </div>
             <div className="mb-4">
               <label htmlFor="password" className="block text-brand-dark mb-2">Password</label>
-              <input type="password" id="password" placeholder="********" value={password} 
+              <input type="password" id="password" placeholder="********" value={password}
                 onChange={(e) => setPassword(e.target.value)} 
                 className="w-full px-4 py-2 border border-brand-gray rounded-lg focus:outline-none focus:border-brand-bronze" required/>
             </div>
-            <button type="submit" className={`w-full py-2 bg-brand-bronze text-white rounded-lg hover:bg-opacity-90 transition ${loading ? 'opacity-50 cursor-not-allowed' : ''}`}
+            <button type="submit" className={`w-full py-2 bg-brand-bronze text-white rounded-lg hover:bg-opacity-90 transition ${
+                loading ? 'opacity-50 cursor-not-allowed' : ''
+              }`}
               disabled={loading}>
               {loading ? 'Signing Up...' : 'Sign Up'}
             </button>
           </form>
         </div>
       </div>
-      <div
-        className="hidden lg:block w-1/2 bg-cover bg-center" style={{ backgroundImage: 'url(/dashboard-signup.jpg)' }}>
+      <div className="hidden lg:block w-1/2 bg-cover bg-center" style={{ backgroundImage: 'url(/dashboard-signup.jpg)' }}>
       </div>
     </div>
   );
