@@ -133,13 +133,13 @@ export default function DashboardOverview() {
         <div className="bg-white p-6 rounded shadow-lg">
           <h3 className="text-lg font-bold text-brand-dark">Recent Posts</h3>
           <ul className="text-brand-gray mt-2">
-            {metrics.recentPosts.map((post) => (
-              <li key={post.id}>
+            {metrics.recentPosts.map((post, index) => (
+              <li key={post.id || index}>
                 {post.content} - {post.likes} likes
-              </li>
-            ))}
-          </ul>
-        </div>
+                </li>
+              ))}
+              </ul>
+              </div>
       </div>
       <div className="mt-6 space-y-6">
         <div className="bg-white p-6 rounded shadow-lg">
