@@ -10,6 +10,7 @@ export default function ProfilePage() {
     avatar_url: '',
   });
 
+  const [socialAccounts, setSocialAccounts] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [successMessage, setSuccessMessage] = useState<string | null>(null);
@@ -19,21 +20,33 @@ export default function ProfilePage() {
     const fetchProfile = async () => {
       try {
         setLoading(true);
-        const { data, error } = await supabase.auth.getUser();
 
-        if (error) {
-          console.error('Error fetching profile:', error.message);
+        const { data: userData, error: userError } = await supabase.auth.getUser();
+
+        if (userError) {
+          console.error('Error fetching profile:', userError.message);
           setError('Failed to fetch profile information.');
         } else {
           setProfile({
-            name: data?.user_metadata?.full_name || '',
-            email: data?.email || '',
-            bio: data?.user_metadata?.bio || '',
-            avatar_url: data?.user_metadata?.avatar_url || '',
+            name: userData?.user_metadata?.full_name || '',
+            email: userData?.email || '',
+            bio: userData?.user_metadata?.bio || '',
+            avatar_url: userData?.user_metadata?.avatar_url || '',
           });
         }
+
+        const { data: socialsData, error: socialsError } = await supabase
+          .from('user_socials')
+          .select('platform, username');
+
+        if (socialsError) {
+          console.error('Error fetching social accounts:', socialsError.message);
+          setError('Failed to fetch connected social accounts.');
+        } else {
+          setSocialAccounts(socialsData || []);
+        }
       } catch (err) {
-        console.error('Unexpected error fetching profile:', err);
+        console.error('Unexpected error fetching profile or social accounts:', err);
         setError('An unexpected error occurred. Please try again.');
       } finally {
         setLoading(false);
@@ -116,7 +129,8 @@ export default function ProfilePage() {
             Full Name
           </label>
           <input type="text" id="name" value={profile.name}
-            onChange={(e) => setProfile({ ...profile, name: e.target.value })} className="mt-1 block w-full border border-gray-300 rounded-md shadow-sm p-2"required/>
+            onChange={(e) => setProfile({ ...profile, name: e.target.value })}
+            className="mt-1 block w-full border border-gray-300 rounded-md shadow-sm p-2" required/>
         </div>
         <div>
           <label htmlFor="email" className="block text-sm font-medium text-gray-700">
@@ -125,13 +139,11 @@ export default function ProfilePage() {
           <input type="email" id="email" value={profile.email} readOnly
             className="mt-1 block w-full border border-gray-300 rounded-md shadow-sm p-2 bg-gray-100"/>
         </div>
-
         <div>
           <label htmlFor="bio" className="block text-sm font-medium text-gray-700">
             Bio
           </label>
-          <textarea id="bio" value={profile.bio} onChange={(e) => setProfile({ ...profile, bio: e.target.value })}
-            className="mt-1 block w-full border border-gray-300 rounded-md shadow-sm p-2" rows={4}> 
+          <textarea id="bio" value={profile.bio} onChange={(e) => setProfile({ ...profile, bio: e.target.value })} className="mt-1 block w-full border border-gray-300 rounded-md shadow-sm p-2"rows={4}>
           </textarea>
         </div>
         <div>
@@ -146,11 +158,24 @@ export default function ProfilePage() {
             </div>
           )}
         </div>
-
         <button type="submit" className="w-full py-2 px-4 bg-blue-600 text-white rounded-lg hover:bg-blue-700">
             Update Profile
         </button>
       </form>
+      <div className="mt-6">
+        <h2 className="text-xl font-bold mb-4">Connected Social Accounts</h2>
+        {socialAccounts.length > 0 ? (
+          <ul className="list-disc pl-5">
+            {socialAccounts.map((account, index) => (
+              <li key={index}>
+                <span className="font-medium">{account.platform}:</span> {account.username}
+              </li>
+            ))}
+          </ul>
+        ) : (
+          <p className="text-gray-500">No social accounts connected.</p>
+        )}
+      </div>
     </div>
   );
 }
