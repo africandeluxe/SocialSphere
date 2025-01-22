@@ -1,7 +1,8 @@
-'use client'
+'use client';
+
 import Link from 'next/link';
 
-export default function DashboardLayout({ children }: { children: React.ReactNode }) {
+export default function ProfileLayout({ children }: { children: React.ReactNode }) {
   return (
     <div className="min-h-screen flex bg-brand-cream">
       <aside className="w-64 bg-brand-dark text-white flex flex-col p-6">
@@ -30,10 +31,7 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
       </aside>
       <div className="flex-1 flex flex-col">
         <header className="h-16 bg-white shadow-md flex items-center justify-between px-6">
-          <h2 className="text-xl font-bold text-brand-dark">Dashboard</h2>
-          <div>
-            <button className="py-2 px-4 bg-brand-bronze text-white rounded hover:bg-opacity-90">Notifications</button>
-          </div>
+          <h2 className="text-xl font-bold text-brand-dark">Profile</h2>
         </header>
         <main className="flex-1 p-6">{children}</main>
       </div>
