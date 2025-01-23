@@ -1,4 +1,5 @@
-'use client'
+'use client';
+
 import { createContext, useContext, useState, useEffect, ReactNode } from 'react';
 import { supabase } from '../lib/supabaseClient';
 import { Session } from '@supabase/supabase-js';
@@ -16,36 +17,19 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
 
   useEffect(() => {
     const fetchSession = async () => {
-      try {
-        console.log('Fetching session...');
-        const { data, error } = await supabase.auth.getSession();
-
-        if (error) {
-          console.error('Error fetching session:', error.message);
-        } else {
-          console.log('Initial session:', data.session);
-          setSession(data.session);
-        }
-      } catch (err) {
-        console.error('Unexpected error during session fetch:', err);
-      } finally {
-        setIsLoading(false);
-      }
+      const { data } = await supabase.auth.getSession();
+      setSession(data.session);
+      setIsLoading(false);
     };
 
     fetchSession();
 
-    const { data: authListener } = supabase.auth.onAuthStateChange((event, session) => {
-      console.log(`Auth state changed (${event}):`, session);
+    const { data: subscription } = supabase.auth.onAuthStateChange((_, session) => {
       setSession(session);
     });
 
-    return () => {
-      authListener?.subscription?.unsubscribe();
-    };
+    return () => subscription.subscription?.unsubscribe();
   }, []);
-
-  console.log('AuthProvider current state:', { session, isLoading });
 
   return (
     <AuthContext.Provider value={{ session, isLoading }}>

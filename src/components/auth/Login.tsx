@@ -1,4 +1,4 @@
-'use client'
+'use client';
 import { useState, useEffect } from 'react';
 import { supabase } from '../../lib/supabaseClient';
 import { useAuth } from '../../context/AuthContext';
@@ -14,19 +14,11 @@ export default function Login() {
   const router = useRouter();
 
   useEffect(() => {
-    if (authLoading) {
-      console.log('Auth is still loading...');
-    } else {
-      console.log('Auth session:', session);
-    }
-  }, [authLoading, session]);
-
-  useEffect(() => {
-    if (session) {
+    if (!authLoading && session) {
       console.log('User is logged in. Redirecting to /dashboard...');
-      router.replace('/dashboard');
+      router.push('/dashboard'); // Redirect immediately if session exists
     }
-  }, [session, router]);
+  }, [authLoading, session, router]);
 
   const handleLogin = async () => {
     setError(null);
@@ -47,15 +39,21 @@ export default function Login() {
       }
 
       if (data?.session) {
-        console.log('Login successful. Session:', data.session);
+        console.log('Login successful. Refreshing session...');
+        
+        // Refresh session to ensure cookies are properly set
+        const { data: sessionData, error: refreshError } = await supabase.auth.getSession();
 
-        console.log('Document cookies immediately after login:', document.cookie);
+        if (refreshError) {
+          console.error('Failed to refresh session:', refreshError.message);
+          setError('Failed to refresh session. Please try again.');
+          return;
+        }
 
-        setTimeout(() => {
-          console.log('Document cookies after 1 second:', document.cookie);
-        }, 1000);
+        console.log('Session after login:', sessionData);
 
-        router.replace('/dashboard');
+        // Redirect to the dashboard
+        router.push('/dashboard');
       }
     } catch (err) {
       console.error('Unexpected error during login:', err);
@@ -83,30 +81,47 @@ export default function Login() {
 
           {error && <p className="text-red-500 bg-red-100 p-3 rounded-lg mb-4">{error}</p>}
 
-          <form onSubmit={(e) => {
+          <form
+            onSubmit={(e) => {
               e.preventDefault();
               if (!loading) handleLogin();
-            }}>
+            }}
+          >
             <div className="mb-4">
               <label htmlFor="email" className="block text-brand-dark mb-2">
                 Email Address
               </label>
-              <input type="email" id="email" placeholder="john.doe@example.com" value={email} onChange={(e) => setEmail(e.target.value)}
+              <input
+                type="email"
+                id="email"
+                placeholder="john.doe@example.com"
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
                 className="w-full px-4 py-2 border border-brand-gray rounded-lg focus:outline-none focus:border-brand-bronze"
-                required/>
+                required
+              />
             </div>
             <div className="mb-6">
               <label htmlFor="password" className="block text-brand-dark mb-2">
                 Password
               </label>
-              <input type="password" id="password" placeholder="********" value={password}
+              <input
+                type="password"
+                id="password"
+                placeholder="********"
+                value={password}
                 onChange={(e) => setPassword(e.target.value)}
-                className="w-full px-4 py-2 border border-brand-gray rounded-lg focus:outline-none focus:border-brand-bronze" required/>
+                className="w-full px-4 py-2 border border-brand-gray rounded-lg focus:outline-none focus:border-brand-bronze"
+                required
+              />
             </div>
-            <button type="submit" className={`w-full py-2 bg-brand-bronze text-white rounded-lg hover:bg-opacity-90 transition ${
+            <button
+              type="submit"
+              className={`w-full py-2 bg-brand-bronze text-white rounded-lg hover:bg-opacity-90 transition ${
                 loading ? 'opacity-50 cursor-not-allowed' : ''
               }`}
-              disabled={loading}>
+              disabled={loading}
+            >
               {loading ? 'Logging In...' : 'Log In'}
             </button>
           </form>
@@ -114,8 +129,8 @@ export default function Login() {
       </div>
       <div
         className="hidden lg:block w-1/2 bg-cover bg-center"
-        style={{ backgroundImage: 'url(/Login-Dashboard.jpg)' }}>
-        </div>
+        style={{ backgroundImage: 'url(/Login-Dashboard.jpg)' }}
+      ></div>
     </div>
   );
 }
