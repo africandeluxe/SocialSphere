@@ -32,19 +32,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
       </head>
       <body className="bg-brand-cream text-brand-dark min-h-screen antialiased">
         <AuthProvider>
-          <div className="flex flex-col min-h-screen">
-            <header className="py-4 bg-brand-dark text-white shadow-md">
-              <div className="container mx-auto px-4">
-                <h1 className="text-lg font-bold">SocialSphere</h1>
-              </div>
-            </header>
             <main className="flex-grow">{children}</main>
-            <footer className="py-4 bg-brand-dark text-white">
-              <div className="container mx-auto px-4 text-center">
-                <p className="text-sm">&copy; {new Date().getFullYear()} SocialSphere. All rights reserved.</p>
-              </div>
-            </footer>
-          </div>
         </AuthProvider>
       </body>
     </html>
