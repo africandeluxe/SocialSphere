@@ -7,6 +7,7 @@ import {
   PointElement,
   Legend,
   Tooltip,
+  TooltipItem, // Import TooltipItem type
 } from 'chart.js';
 
 // Register ChartJS components
@@ -73,7 +74,7 @@ export default function Chart({ data, showLegend = true }: ChartProps) {
       },
       tooltip: {
         callbacks: {
-          label: (tooltipItem: any) =>
+          label: (tooltipItem: TooltipItem<'line'>) => // Use TooltipItem type
             `${tooltipItem.dataset.label}: ${tooltipItem.raw} followers`,
         },
       },

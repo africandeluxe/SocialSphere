@@ -6,7 +6,7 @@ import 'react-calendar/dist/Calendar.css';
 import dayjs from 'dayjs';
 import { supabase } from '../../lib/supabaseClient';
 
-interface Content {
+interface ContentPlan {
   id: number;
   title: string;
   platform: string;
@@ -14,15 +14,15 @@ interface Content {
 }
 
 export default function ContentCalendar() {
-  const [currentDate, setCurrentDate] = useState(new Date());
-  const [contentList, setContentList] = useState<Content[]>([]);
+  const [currentDate] = useState(new Date()); // Removed setCurrentDate
+  const [contentList, setContentList] = useState<ContentPlan[]>([]);
   const [newContent, setNewContent] = useState({ title: '', platform: '' });
   const [selectedDate, setSelectedDate] = useState<string | null>(null);
 
   useEffect(() => {
     const fetchContent = async () => {
       try {
-        const { data, error } = await supabase.from('content_plans').select('*');
+        const { data, error } = await supabase.from<ContentPlan>('content_plans').select('*');
         if (error) throw error;
         setContentList(data || []);
       } catch (err) {
@@ -41,7 +41,7 @@ export default function ContentCalendar() {
         .from('content_plans')
         .insert([{ date: selectedDate, ...newContent }]);
       if (error) throw error;
-      setContentList([...contentList, ...data]);
+      setContentList((prev) => [...prev, ...data!]);
       setNewContent({ title: '', platform: '' });
       setSelectedDate(null);
     } catch (err) {
