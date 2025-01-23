@@ -1,12 +1,21 @@
-'use client'
+'use client';
 import { useState, useEffect } from 'react';
 import { supabase } from '../../../lib/supabaseClient';
 import DashboardLayout from '../../../components/dashboard/DashboardLayout';
 
+interface Post {
+  id: number;
+  content: string;
+  likes: number;
+  created_at: string;
+}
+
 export default function ContentManagementPage() {
-  const [posts, setPosts] = useState([]);
+  const [posts, setPosts] = useState<Post[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [modalOpen, setModalOpen] = useState(false);
+  const [editingPost, setEditingPost] = useState<Post | null>(null);
 
   useEffect(() => {
     const fetchPosts = async () => {
@@ -80,9 +89,14 @@ export default function ContentManagementPage() {
       if (fetchError) throw fetchError;
 
       setPosts(updatedPosts || []);
-    } catch (err: any) {
-      console.error('Error saving post:', err.message);
-      setError('Failed to save post. Please try again.');
+    } catch (err: unknown) {
+      if (err instanceof Error) {
+        console.error('Error saving post:', err.message);
+        setError('Failed to save post. Please try again.');
+      } else {
+        console.error('Unexpected error:', err);
+        setError('An unexpected error occurred.');
+      }
     }
   };
 

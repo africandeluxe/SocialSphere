@@ -1,4 +1,4 @@
-'use client'
+'use client';
 import { useState, useEffect } from 'react';
 import { supabase } from '../../../lib/supabaseClient';
 
@@ -9,8 +9,10 @@ export default function ProfilePage() {
     bio: '',
     avatar_url: '',
   });
+  const [file, setFile] = useState<File | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [successMessage, setSuccessMessage] = useState<string | null>(null);
 
   useEffect(() => {
     const fetchProfile = async () => {
@@ -28,7 +30,7 @@ export default function ProfilePage() {
           bio: userData?.user_metadata?.bio || '',
           avatar_url: userData?.user_metadata?.avatar_url || '',
         });
-      } catch (err: unknown) {
+      } catch (err) {
         if (err instanceof Error) {
           console.error('Error fetching profile:', err.message);
           setError('Failed to fetch profile information.');
@@ -44,30 +46,28 @@ export default function ProfilePage() {
     fetchProfile();
   }, []);
 
-  const uploadAvatar = async () => {
+  const uploadAvatar = async (): Promise<string | undefined> => {
     if (!file) return;
 
     try {
       const filePath = `avatars/${Date.now()}_${file.name}`;
-      const { data, error } = await supabase.storage
-        .from('avatars')
-        .upload(filePath, file);
+      const { error } = await supabase.storage.from('avatars').upload(filePath, file);
 
       if (error) {
-        console.error('Error uploading avatar:', error.message);
-        setError('Failed to upload profile picture.');
-        return;
+        throw new Error(error.message);
       }
 
-      const publicUrl = supabase.storage
-        .from('avatars')
-        .getPublicUrl(filePath).data.publicUrl;
+      const { data } = supabase.storage.from('avatars').getPublicUrl(filePath);
 
-      setProfile((prev) => ({ ...prev, avatar_url: publicUrl }));
-      return publicUrl;
+      if (!data) {
+        throw new Error('Failed to retrieve public URL for avatar.');
+      }
+
+      setProfile((prev) => ({ ...prev, avatar_url: data.publicUrl }));
+      return data.publicUrl;
     } catch (err) {
-      console.error('Unexpected error during avatar upload:', err);
-      setError('An unexpected error occurred. Please try again.');
+      console.error('Error uploading avatar:', err);
+      setError('An unexpected error occurred while uploading the avatar.');
     }
   };
 
@@ -79,7 +79,7 @@ export default function ProfilePage() {
     try {
       let avatarUrl = profile.avatar_url;
       if (file) {
-        avatarUrl = await uploadAvatar();
+        avatarUrl = (await uploadAvatar()) || avatarUrl;
       }
 
       const { error } = await supabase.auth.updateUser({
@@ -91,14 +91,13 @@ export default function ProfilePage() {
       });
 
       if (error) {
-        console.error('Error updating profile:', error.message);
-        setError('Failed to update profile information.');
-      } else {
-        setSuccessMessage('Profile updated successfully!');
+        throw new Error(error.message);
       }
+
+      setSuccessMessage('Profile updated successfully!');
     } catch (err) {
-      console.error('Unexpected error updating profile:', err);
-      setError('An unexpected error occurred. Please try again.');
+      console.error('Error updating profile:', err);
+      setError('Failed to update profile information. Please try again.');
     }
   };
 
@@ -107,8 +106,8 @@ export default function ProfilePage() {
   }
 
   return (
-    <div className="p-4 sm:p-6 md:p-8 bg-white rounded shadow-lg max-w-lg md:max-w-2xl mx-auto">
-      <h1 className="text-2xl md:text-3xl font-bold mb-6 text-center">Profile</h1>
+    <div className="p-4 sm:p-6 bg-white rounded shadow-lg max-w-lg mx-auto">
+      <h1 className="text-2xl font-bold mb-6 text-center">Profile</h1>
       <form onSubmit={handleUpdate} className="space-y-6">
         {error && <p className="text-red-500">{error}</p>}
         {successMessage && <p className="text-green-500">{successMessage}</p>}
@@ -158,39 +157,25 @@ export default function ProfilePage() {
             id="avatar"
             accept="image/*"
             onChange={(e) => setFile(e.target.files?.[0] || null)}
-            className="mt-1 block w-full text-sm text-gray-500 file:py-2 file:px-4 file:rounded file:border-0 file:text-sm file:font-semibold file:bg-blue-600 file:text-white hover:file:bg-blue-700"
+            className="mt-1 block w-full text-sm text-gray-500"
           />
           {profile.avatar_url && (
             <div className="mt-4 flex justify-center">
               <img
                 src={profile.avatar_url}
                 alt="Profile Avatar"
-                className="w-24 h-24 sm:w-32 sm:h-32 rounded-full shadow-md"
+                className="w-24 h-24 rounded-full shadow-md"
               />
             </div>
           )}
         </div>
         <button
           type="submit"
-          className="w-full py-2 px-4 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition"
+          className="w-full py-2 px-4 bg-blue-600 text-white rounded-lg hover:bg-blue-700"
         >
           Update Profile
         </button>
       </form>
-      <div className="mt-8">
-        <h2 className="text-xl font-bold mb-4">Connected Social Accounts</h2>
-        {socialAccounts.length > 0 ? (
-          <ul className="list-disc pl-5 space-y-2">
-            {socialAccounts.map((account, index) => (
-              <li key={index} className="text-sm">
-                <span className="font-medium">{account.platform}:</span> {account.username}
-              </li>
-            ))}
-          </ul>
-        ) : (
-          <p className="text-gray-500">No social accounts connected.</p>
-        )}
-      </div>
     </div>
   );
 }
