@@ -1,6 +1,7 @@
 'use client'
 import { motion, useAnimation, useInView } from 'framer-motion';
 import { useRef, useEffect } from 'react';
+import Link from 'next/link';
 
 export default function Hero() {
   const mockupRef = useRef(null);
@@ -47,10 +48,9 @@ export default function Hero() {
       </motion.div>
       <motion.div initial={{ opacity: 0, y: 50 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 1, delay: 0.8 }}
         className="absolute bottom-8 sm:bottom-10 text-center">
-        <a href="#get-started"
-          className="bg-brand-bronze text-brand-light py-2 px-4 sm:py-3 sm:px-6 rounded-full shadow-lg hover:bg-brand-moss transition duration-300 text-sm sm:text-base">
+        <Link href="/login" className="bg-brand-bronze text-brand-light py-2 px-4 sm:py-3 sm:px-6 rounded-full shadow-lg hover:bg-brand-moss transition duration-300 text-sm sm:text-base">
           Get Early Access Now
-        </a>
+        </Link>
         <p className="mt-2 sm:mt-4 text-xs sm:text-sm text-brand-gray">
           Don’t be late to the party – Get Early Access Today!
         </p>
