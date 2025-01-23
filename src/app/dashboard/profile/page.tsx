@@ -9,45 +9,33 @@ export default function ProfilePage() {
     bio: '',
     avatar_url: '',
   });
-
-  const [socialAccounts, setSocialAccounts] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
-  const [successMessage, setSuccessMessage] = useState<string | null>(null);
-  const [file, setFile] = useState<File | null>(null);
 
   useEffect(() => {
     const fetchProfile = async () => {
       try {
         setLoading(true);
-
         const { data: userData, error: userError } = await supabase.auth.getUser();
 
         if (userError) {
-          console.error('Error fetching profile:', userError.message);
+          throw new Error(userError.message);
+        }
+
+        setProfile({
+          name: userData?.user_metadata?.full_name || '',
+          email: userData?.email || '',
+          bio: userData?.user_metadata?.bio || '',
+          avatar_url: userData?.user_metadata?.avatar_url || '',
+        });
+      } catch (err: unknown) {
+        if (err instanceof Error) {
+          console.error('Error fetching profile:', err.message);
           setError('Failed to fetch profile information.');
         } else {
-          setProfile({
-            name: userData?.user_metadata?.full_name || '',
-            email: userData?.email || '',
-            bio: userData?.user_metadata?.bio || '',
-            avatar_url: userData?.user_metadata?.avatar_url || '',
-          });
+          console.error('Unexpected error:', err);
+          setError('An unexpected error occurred.');
         }
-
-        const { data: socialsData, error: socialsError } = await supabase
-          .from('user_socials')
-          .select('platform, username');
-
-        if (socialsError) {
-          console.error('Error fetching social accounts:', socialsError.message);
-          setError('Failed to fetch connected social accounts.');
-        } else {
-          setSocialAccounts(socialsData || []);
-        }
-      } catch (err) {
-        console.error('Unexpected error fetching profile or social accounts:', err);
-        setError('An unexpected error occurred. Please try again.');
       } finally {
         setLoading(false);
       }

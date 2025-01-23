@@ -4,19 +4,31 @@ import type { NextRequest } from 'next/server';
 
 export async function middleware(req: NextRequest) {
   const res = NextResponse.next();
+
+  const isProduction = process.env.NODE_ENV === 'production';
+
   const supabase = createMiddlewareClient({ req, res }, {
     cookieOptions: {
       name: 'sb-auth-token',
       sameSite: 'Lax',
-      secure: false,
-      domain: 'localhost',
+      secure: isProduction,
+      domain: isProduction ? process.env.COOKIE_DOMAIN : 'localhost',
     },
   });
 
-  const { data: { session }, error } = await supabase.auth.getSession();
+  try {
+    const { data: { session }, error } = await supabase.auth.getSession();
 
-  if (error) {
-    console.error('Error fetching session in middleware:', error.message);
+    if (error) {
+      console.error('Error fetching session in middleware:', error.message);
+    }
+
+    if (!session) {
+      return NextResponse.redirect(new URL('/login', req.url));
+    }
+  } catch (err) {
+    console.error('Unexpected error in middleware:', err);
+    return NextResponse.redirect(new URL('/error', req.url));
   }
 
   return res;

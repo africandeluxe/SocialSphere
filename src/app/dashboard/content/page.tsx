@@ -1,4 +1,4 @@
-'use client';
+'use client'
 import { useState, useEffect } from 'react';
 import { supabase } from '../../../lib/supabaseClient';
 import DashboardLayout from '../../../components/dashboard/DashboardLayout';
@@ -7,8 +7,6 @@ export default function ContentManagementPage() {
   const [posts, setPosts] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
-  const [modalOpen, setModalOpen] = useState(false);
-  const [editingPost, setEditingPost] = useState(null);
 
   useEffect(() => {
     const fetchPosts = async () => {
@@ -22,9 +20,14 @@ export default function ContentManagementPage() {
         if (error) throw error;
 
         setPosts(data || []);
-      } catch (err: any) {
-        console.error('Error fetching posts:', err.message);
-        setError('Failed to load posts. Please try again.');
+      } catch (err: unknown) {
+        if (err instanceof Error) {
+          console.error('Error fetching posts:', err.message);
+          setError('Failed to load posts. Please try again.');
+        } else {
+          console.error('Unexpected error:', err);
+          setError('An unexpected error occurred.');
+        }
       } finally {
         setLoading(false);
       }
@@ -37,10 +40,16 @@ export default function ContentManagementPage() {
     try {
       const { error } = await supabase.from('posts').delete().eq('id', id);
       if (error) throw error;
+
       setPosts((prev) => prev.filter((post) => post.id !== id));
-    } catch (err: any) {
-      console.error('Error deleting post:', err.message);
-      setError('Failed to delete post. Please try again.');
+    } catch (err: unknown) {
+      if (err instanceof Error) {
+        console.error('Error deleting post:', err.message);
+        setError('Failed to delete post. Please try again.');
+      } else {
+        console.error('Unexpected error:', err);
+        setError('An unexpected error occurred.');
+      }
     }
   };
 

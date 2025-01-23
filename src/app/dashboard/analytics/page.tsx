@@ -6,9 +6,9 @@ import Chart from '../../../components/dashboard/Chart';
 
 export default function AnalyticsPage() {
   const [metrics, setMetrics] = useState({
-    instagramGrowth: [],
-    tiktokGrowth: [],
-    topPosts: [],
+    instagramGrowth: [] as number[],
+    tiktokGrowth: [] as number[],
+    topPosts: [] as { id: number; content: string; likes: number }[],
   });
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -44,13 +44,18 @@ export default function AnalyticsPage() {
         }
 
         setMetrics({
-          instagramGrowth: instagramData.map((row) => row.new_followers),
-          tiktokGrowth: tiktokData.map((row) => row.new_followers),
+          instagramGrowth: instagramData?.map((row) => row.new_followers) || [],
+          tiktokGrowth: tiktokData?.map((row) => row.new_followers) || [],
           topPosts: posts || [],
         });
-      } catch (err: any) {
-        console.error('Error fetching metrics:', err.message);
-        setError('Failed to load metrics. Please try again.');
+      } catch (err: unknown) {
+        if (err instanceof Error) {
+          console.error('Error fetching metrics:', err.message);
+          setError('Failed to load metrics. Please try again.');
+        } else {
+          console.error('Unexpected error:', err);
+          setError('An unexpected error occurred.');
+        }
       } finally {
         setLoading(false);
       }
@@ -93,8 +98,8 @@ export default function AnalyticsPage() {
           <h3 className="text-lg font-bold text-brand-dark">Follower Growth Trend</h3>
           <Chart
             data={{
-              instagram: metrics.instagramGrowth.flat(),
-              tiktok: metrics.tiktokGrowth.flat(),
+              instagram: metrics.instagramGrowth,
+              tiktok: metrics.tiktokGrowth,
             }}
           />
         </div>
@@ -102,7 +107,7 @@ export default function AnalyticsPage() {
           <h3 className="text-lg font-bold text-brand-dark">Instagram Growth</h3>
           <Chart
             data={{
-              instagram: metrics.instagramGrowth.flat(),
+              instagram: metrics.instagramGrowth,
             }}
             showLegend={false}
           />
@@ -111,7 +116,7 @@ export default function AnalyticsPage() {
           <h3 className="text-lg font-bold text-brand-dark">TikTok Growth</h3>
           <Chart
             data={{
-              tiktok: metrics.tiktokGrowth.flat(),
+              tiktok: metrics.tiktokGrowth,
             }}
             showLegend={false}
           />
