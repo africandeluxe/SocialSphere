@@ -16,34 +16,46 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
 
   useEffect(() => {
     const fetchSession = async () => {
-      console.log('Fetching session...');
-      const { data, error } = await supabase.auth.getSession();
+      try {
+        console.log('Fetching session...');
+        const { data, error } = await supabase.auth.getSession();
 
-      if (error) {
-        console.error('Error fetching session in AuthProvider:', error.message);
-      } else {
-        console.log('Session in AuthProvider:', data.session);
-        setSession(data.session);
+        if (error) {
+          console.error('Error fetching session:', error.message);
+        } else {
+          console.log('Initial session:', data.session);
+          setSession(data.session);
+        }
+      } catch (err) {
+        console.error('Unexpected error during session fetch:', err);
+      } finally {
+        setIsLoading(false);
       }
-
-      setIsLoading(false);
     };
 
     fetchSession();
 
-    const { data: subscription } = supabase.auth.onAuthStateChange((_event, session) => {
-      console.log('Auth state changed:', session);
+    const { data: subscription } = supabase.auth.onAuthStateChange((event, session) => {
+      console.log(`Auth state changed (${event}):`, session);
       setSession(session);
     });
 
-    return () => subscription.unsubscribe();
+    return () => {
+      subscription.unsubscribe();
+    };
   }, []);
 
-  console.log('AuthProvider state:', { session, isLoading });
+  console.log('AuthProvider current state:', { session, isLoading });
 
   return (
     <AuthContext.Provider value={{ session, isLoading }}>
-      {children}
+      {isLoading ? (
+        <div className="flex items-center justify-center min-h-screen">
+          <p>Loading authentication...</p>
+        </div>
+      ) : (
+        children
+      )}
     </AuthContext.Provider>
   );
 };

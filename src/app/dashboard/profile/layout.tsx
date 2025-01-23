@@ -1,5 +1,4 @@
-'use client';
-
+'use client'
 import Link from 'next/link';
 import { useState } from 'react';
 
@@ -8,51 +7,38 @@ export default function ProfileLayout({ children }: { children: React.ReactNode 
 
   return (
     <div className="min-h-screen flex bg-brand-cream">
-      {/* Sidebar */}
       <aside
         className={`fixed top-0 left-0 h-full w-64 bg-brand-dark text-white flex flex-col p-6 transform ${
           isSidebarOpen ? 'translate-x-0' : '-translate-x-full'
-        } transition-transform md:translate-x-0 z-50`}
-      >
+        } transition-transform md:translate-x-0 z-50`}>
         <div className="mb-8">
           <h1 className="text-2xl font-bold">SocialSphere</h1>
         </div>
         <nav>
           <ul className="space-y-4">
             <li>
-              <Link
-                href="/dashboard"
-                className="block py-2 px-4 rounded hover:bg-brand-moss"
-                onClick={() => setIsSidebarOpen(false)}
-              >
+              <Link href="/dashboard" className="block py-2 px-4 rounded hover:bg-brand-moss"
+               onClick={() => setIsSidebarOpen(false)}>
                 Overview
               </Link>
             </li>
             <li>
-              <Link
-                href="/dashboard/profile"
-                className="block py-2 px-4 rounded hover:bg-brand-moss"
-                onClick={() => setIsSidebarOpen(false)}
-              >
+              <Link href="/dashboard/profile" className="block py-2 px-4 rounded hover:bg-brand-moss"
+                onClick={() => setIsSidebarOpen(false)}>
                 Profile
               </Link>
             </li>
             <li>
-              <Link
-                href="/dashboard/analytics"
+              <Link href="/dashboard/analytics"
                 className="block py-2 px-4 rounded hover:bg-brand-moss"
-                onClick={() => setIsSidebarOpen(false)}
-              >
+                onClick={() => setIsSidebarOpen(false)}>
                 Analytics
               </Link>
             </li>
             <li>
-              <Link
-                href="/dashboard/content"
-                className="block py-2 px-4 rounded hover:bg-brand-moss"
-                onClick={() => setIsSidebarOpen(false)}
-              >
-                Content Management
+              <Link href="/dashboard/content" className="block py-2 px-4 rounded hover:bg-brand-moss"
+                onClick={() => setIsSidebarOpen(false)}>
+                  Content Management
               </Link>
             </li>
           </ul>
@@ -63,30 +49,20 @@ export default function ProfileLayout({ children }: { children: React.ReactNode 
           </button>
         </div>
       </aside>
-
-      {/* Main Content */}
       <div className="flex-1 flex flex-col ml-0 md:ml-64">
-        {/* Header */}
         <header className="h-16 bg-white shadow-md flex items-center justify-between px-6">
           <h2 className="text-xl font-bold text-brand-dark">Profile</h2>
           <button
             className="text-brand-dark md:hidden"
-            onClick={() => setIsSidebarOpen(!isSidebarOpen)}
-          >
-            ☰
+            onClick={() => setIsSidebarOpen(!isSidebarOpen)}>
+              ☰
           </button>
         </header>
-
-        {/* Main Content */}
         <main className="flex-1 p-6">{children}</main>
       </div>
-
-      {/* Backdrop for Sidebar on Mobile */}
       {isSidebarOpen && (
-        <div
-          className="fixed inset-0 bg-black bg-opacity-50 md:hidden"
-          onClick={() => setIsSidebarOpen(false)}
-        ></div>
+        <div className="fixed inset-0 bg-black bg-opacity-50 md:hidden"
+          onClick={() => setIsSidebarOpen(false)}></div>
       )}
     </div>
   );

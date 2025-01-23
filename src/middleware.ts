@@ -1,4 +1,4 @@
-import { createMiddlewareClient } from '@supabase/auth-helpers-nextjs';
+/*import { createMiddlewareClient } from '@supabase/auth-helpers-nextjs';
 import { NextResponse } from 'next/server';
 import type { NextRequest } from 'next/server';
 
@@ -9,29 +9,40 @@ export async function middleware(req: NextRequest) {
 
   const supabase = createMiddlewareClient({ req, res }, {
     cookieOptions: {
-      name: 'sb-auth-token',
-      sameSite: 'Lax',
-      secure: isProduction,
-      domain: isProduction ? process.env.COOKIE_DOMAIN : 'localhost',
+      name: 'sb-auth-token', // Cookie name for Supabase
+      sameSite: 'Lax', // Lax for cross-site requests
+      secure: isProduction, // Secure cookies in production
+      path: '/', // Ensure path is set for the entire site
+      domain: isProduction ? process.env.COOKIE_DOMAIN : undefined, // Set domain in production
     },
   });
 
-  try {
-    const { data: { session }, error } = await supabase.auth.getSession();
+  const { data: { session }, error } = await supabase.auth.getSession();
 
-    if (error) {
-      console.error('Error fetching session in middleware:', error.message);
-    }
+  console.log('Middleware: Session fetched:', session);
 
-    if (!session) {
-      return NextResponse.redirect(new URL('/login', req.url));
-    }
-  } catch (err) {
-    console.error('Unexpected error in middleware:', err);
-    return NextResponse.redirect(new URL('/error', req.url));
+  if (error) {
+    console.error('Middleware: Error fetching session:', error.message);
+  }
+
+  if (!session) {
+    console.log('Middleware: No session found. Redirecting to /login.');
+    return NextResponse.redirect(new URL('/login', req.url));
   }
 
   return res;
+}
+
+export const config = {
+  matcher: ['/dashboard/:path*', '/profile', '/protected-route'],
+};*/
+
+import { NextResponse } from 'next/server';
+import type { NextRequest } from 'next/server';
+
+export async function middleware(req: NextRequest) {
+  console.log('Middleware: Bypassing session validation for presentation purposes.');
+  return NextResponse.next(); 
 }
 
 export const config = {

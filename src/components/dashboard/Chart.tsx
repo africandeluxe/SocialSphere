@@ -1,18 +1,7 @@
 import { Line } from 'react-chartjs-2';
-import {
-  Chart as ChartJS,
-  LineElement,
-  CategoryScale,
-  LinearScale,
-  PointElement,
-  Legend,
-  Tooltip,
-  TooltipItem, // Import TooltipItem type
-} from 'chart.js';
+import { Chart as ChartJS, LineElement, CategoryScale, LinearScale, PointElement, Legend, Tooltip, TooltipItem} from 'chart.js';
 
-// Register ChartJS components
 ChartJS.register(LineElement, CategoryScale, LinearScale, PointElement, Legend, Tooltip);
-
 interface ChartProps {
   data: {
     instagram?: number[];
@@ -24,16 +13,13 @@ interface ChartProps {
 export default function Chart({ data, showLegend = true }: ChartProps) {
   const { instagram = [], tiktok = [] } = data;
 
-  // Generate labels based on the maximum data length
   const maxDataLength = Math.max(instagram.length, tiktok.length);
   const labels = Array.from({ length: maxDataLength }, (_, i) => `Week ${i + 1}`);
 
-  // Display a fallback message if no data is provided
   if (instagram.length === 0 && tiktok.length === 0) {
     return <p className="text-center text-gray-500">No data available</p>;
   }
 
-  // Chart configuration
   const chartData = {
     labels,
     datasets: [
@@ -74,7 +60,7 @@ export default function Chart({ data, showLegend = true }: ChartProps) {
       },
       tooltip: {
         callbacks: {
-          label: (tooltipItem: TooltipItem<'line'>) => // Use TooltipItem type
+          label: (tooltipItem: TooltipItem<'line'>) =>
             `${tooltipItem.dataset.label}: ${tooltipItem.raw} followers`,
         },
       },

@@ -4,9 +4,23 @@ import { supabase } from '../../../lib/supabaseClient';
 import DashboardLayout from '../../../components/dashboard/DashboardLayout';
 import Chart from '../../../components/dashboard/Chart';
 import ContentCalendar from '../../../components/dashboard/ContentCalendar';
+interface Post {
+  id: number;
+  content: string;
+  likes: number;
+}
+interface Metrics {
+  instagramEngagements: number;
+  tiktokEngagements: number;
+  instagramFollowers: number[];
+  tiktokFollowers: number[];
+  recentPosts: Post[];
+  instagramGrowth: number[];
+  tiktokGrowth: number[];
+}
 
 export default function DashboardOverview() {
-  const [metrics, setMetrics] = useState({
+  const [metrics, setMetrics] = useState<Metrics>({
     instagramEngagements: 0,
     tiktokEngagements: 0,
     instagramFollowers: [],
@@ -22,6 +36,8 @@ export default function DashboardOverview() {
     const fetchMetrics = async () => {
       try {
         setLoading(true);
+        setError(null);
+
         const { data: engagementMetrics, error: engagementError } = await supabase
           .from('engagement_metrics')
           .select('impressions, platform');
@@ -32,18 +48,44 @@ export default function DashboardOverview() {
           .filter((metric) => metric.platform === 'Instagram')
           .reduce((acc, metric) => acc + metric.impressions, 0);
 
-        setMetrics((prev) => ({
-          ...prev,
+        const tiktokEngagements = engagementMetrics
+          .filter((metric) => metric.platform === 'TikTok')
+          .reduce((acc, metric) => acc + metric.impressions, 0);
+
+        const { data: recentPosts, error: postsError } = await supabase
+          .from('posts')
+          .select('id, content, likes')
+          .order('created_at', { ascending: false })
+          .limit(3);
+
+        if (postsError) throw postsError;
+
+        const { data: audienceMetrics, error: audienceError } = await supabase
+          .from('audience_metrics')
+          .select('new_followers, platform');
+
+        if (audienceError) throw audienceError;
+
+        const instagramGrowth = audienceMetrics
+          .filter((metric) => metric.platform === 'Instagram')
+          .map((metric) => metric.new_followers);
+
+        const tiktokGrowth = audienceMetrics
+          .filter((metric) => metric.platform === 'TikTok')
+          .map((metric) => metric.new_followers);
+
+        setMetrics({
           instagramEngagements,
-        }));
+          tiktokEngagements,
+          instagramFollowers: instagramGrowth,
+          tiktokFollowers: tiktokGrowth,
+          recentPosts: recentPosts || [],
+          instagramGrowth,
+          tiktokGrowth,
+        });
       } catch (err: unknown) {
-        if (err instanceof Error) {
-          console.error('Error fetching metrics:', err.message);
-          setError('Failed to load metrics. Please try again.');
-        } else {
-          console.error('Unexpected error:', err);
-          setError('An unexpected error occurred.');
-        }
+        console.error('Error fetching metrics:', err);
+        setError('Failed to load metrics. Please try again.');
       } finally {
         setLoading(false);
       }
@@ -72,7 +114,6 @@ export default function DashboardOverview() {
 
         {error && <p className="text-red-500">{error}</p>}
 
-        {/* Stats Grid */}
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
           <div className="bg-white p-6 rounded-lg shadow-md">
             <h3 className="text-lg font-bold text-gray-800">Instagram Engagement Overview</h3>
@@ -101,25 +142,21 @@ export default function DashboardOverview() {
           <div className="bg-white p-6 rounded-lg shadow-md col-span-1 sm:col-span-2">
             <h3 className="text-lg font-bold text-gray-800">Recent Posts</h3>
             <ul className="text-gray-600 mt-4 space-y-2">
-              {metrics.recentPosts.map((post, index) => (
-                <li key={post.id || index} className="text-sm">
+              {metrics.recentPosts.map((post) => (
+                <li key={post.id} className="text-sm">
                   {post.content} - {post.likes} likes
                 </li>
               ))}
             </ul>
           </div>
         </div>
-
-        {/* Charts and Calendar */}
         <div className="mt-10 space-y-8">
           <div className="bg-white p-6 rounded-lg shadow-md">
             <h3 className="text-lg font-bold text-gray-800">Follower Growth Trend</h3>
-            <Chart
-              data={{
+            <Chart data={{
                 instagram: metrics.instagramGrowth,
                 tiktok: metrics.tiktokGrowth,
-              }}
-            />
+              }}/>
           </div>
           <div className="bg-white p-6 rounded-lg shadow-md">
             <ContentCalendar />

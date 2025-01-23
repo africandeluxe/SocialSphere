@@ -37,17 +37,14 @@ export default function Hero() {
         className="absolute left-4 sm:left-10 top-1/4 text-[10vw] md:text-[9vw] font-extrabold text-brand-bronze opacity-10 z-0">
         Simplify Social Media
       </motion.h1>
-
       <motion.h1 initial={{ opacity: 0, x: 100 }} animate={{ opacity: 0.2, x: 0 }} transition={{ duration: 1.2, delay: 0.2 }}
         className="absolute right-4 sm:right-10 bottom-1/4 text-[12vw] md:text-[15vw] font-extrabold text-brand-bronze opacity-10 z-0" >
         Plan Smarter
       </motion.h1>
-
       <motion.div ref={mockupRef} variants={mockupVariants} initial="hidden" animate={controls} whileHover="hover"
         className="relative z-10">
         <img src="/mockup.png" alt="SocialSphere Mockup" className="w-[90vw] max-w-[600px] md:max-w-[900px] drop-shadow-2xl"/>
       </motion.div>
-
       <motion.div initial={{ opacity: 0, y: 50 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 1, delay: 0.8 }}
         className="absolute bottom-8 sm:bottom-10 text-center">
         <a href="#get-started"

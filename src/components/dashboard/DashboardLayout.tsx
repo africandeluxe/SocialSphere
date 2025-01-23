@@ -1,11 +1,12 @@
-'use client';
-
+'use client'
 import { useState } from 'react';
 import Link from 'next/link';
-import { usePathname } from 'next/navigation';
+import { usePathname, useRouter } from 'next/navigation';
+import { supabase } from '../../lib/supabaseClient';
 
 export default function DashboardLayout({ children }: { children: React.ReactNode }) {
   const pathname = usePathname();
+  const router = useRouter();
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
   const [showNotifications, setShowNotifications] = useState(false);
 
@@ -22,117 +23,71 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
     { name: 'Content Management', href: '/dashboard/content' },
   ];
 
-  const breadcrumbs = pathname
-    .split('/')
-    .filter((part) => part)
-    .map((part, index, array) => ({
-      name: part.charAt(0).toUpperCase() + part.slice(1),
-      href: '/' + array.slice(0, index + 1).join('/'),
-    }));
+  const handleLogout = async () => {
+    try {
+      const { error } = await supabase.auth.signOut();
 
-  const handleLogout = () => {
-    // Redirect to login page on logout
-    console.log('Logout clicked');
+      if (error) {
+        console.error('Error during logout:', error.message);
+        return;
+      }
+
+      console.log('User logged out successfully.');
+
+      router.push('/login');
+    } catch (err) {
+      console.error('Unexpected error during logout:', err);
+    }
   };
 
   return (
-    <div className="min-h-screen flex flex-col lg:flex-row bg-brand-cream">
-      {/* Navbar for Small Devices */}
-      <header className="bg-brand-dark text-white flex items-center justify-between p-4 lg:hidden">
-        <button
-          onClick={() => setIsSidebarOpen(!isSidebarOpen)}
-          className="text-white bg-brand-bronze p-2 rounded-md"
-        >
-          {isSidebarOpen ? 'Close' : 'Menu'}
-        </button>
-        <h1 className="text-lg font-bold">SocialSphere</h1>
-        <button
-          onClick={() => setShowNotifications(!showNotifications)}
-          className="text-white bg-brand-bronze p-2 rounded-md"
-        >
-          Notifications
-        </button>
-      </header>
-
-      {/* Sidebar */}
+    <div className="min-h-screen flex bg-brand-cream">
       <aside
-        className={`fixed top-0 left-0 h-full bg-brand-dark text-white transition-all duration-300 z-50 lg:flex lg:w-64 ${
-          isSidebarOpen ? 'w-64' : 'w-0 overflow-hidden'
-        }`}
-      >
+        className={`fixed top-0 left-0 h-full bg-brand-dark text-white transition-all duration-300 z-50 ${
+          isSidebarOpen ? 'w-64' : 'w-64 lg:w-64'
+        }`}>
         <div className="flex flex-col h-full">
-          {/* Sidebar Header */}
           <div className="flex items-center justify-between p-4">
             <h1 className="text-2xl font-bold">SocialSphere</h1>
-            <button
-              onClick={() => setIsSidebarOpen(false)}
-              className="lg:hidden text-brand-bronze bg-white p-2 rounded-md"
-            >
-              Close
-            </button>
+            <button onClick={() => setIsSidebarOpen(false)}
+              className="lg:hidden text-brand-bronze bg-white p-2 rounded-md">Close</button>
           </div>
-          {/* Navigation Links */}
           <nav className="space-y-4 px-4 py-6">
             {navItems.map((item) => (
-              <Link
-                key={item.name}
-                href={item.href}
+              <Link key={item.name} href={item.href}
                 className={`block py-2 px-4 rounded ${
                   pathname === item.href
                     ? 'bg-brand-moss text-white font-bold'
                     : 'hover:bg-brand-moss text-gray-300'
                 }`}
-                onClick={() => setIsSidebarOpen(false)} // Close menu on click
-              >
-                {item.name}
-              </Link>
+                onClick={() => setIsSidebarOpen(false)}>{item.name}</Link>
             ))}
           </nav>
-          {/* Sidebar Footer */}
           <div className="mt-auto p-4">
-            <button
-              onClick={handleLogout}
-              className="w-full bg-red-500 py-2 px-4 rounded hover:bg-red-600 transition"
-            >
-              Log Out
-            </button>
+            <button onClick={handleLogout}
+              className="w-full bg-red-500 py-2 px-4 rounded hover:bg-red-600 transition">Log Out</button>
           </div>
         </div>
       </aside>
-
-      {/* Main Content */}
-      <div
-        className={`flex-1 flex flex-col transition-all duration-300 ${
-          isSidebarOpen ? 'lg:ml-64' : 'lg:ml-0'
-        }`}
-      >
-        {/* Header */}
+      <div className="flex-1 lg:ml-64 transition-all duration-300">
         <header className="hidden lg:flex h-16 bg-white shadow-md items-center justify-between px-6">
-          {/* Breadcrumbs */}
           <nav className="text-sm text-brand-gray">
-            {breadcrumbs.map((crumb, index) => (
-              <span key={crumb.href}>
-                <Link
-                  href={crumb.href}
-                  className={`hover:underline ${
-                    index === breadcrumbs.length - 1 ? 'text-brand-dark font-bold' : ''
-                  }`}
-                >
-                  {crumb.name}
-                </Link>
-                {index < breadcrumbs.length - 1 && <span> / </span>}
-              </span>
-            ))}
+            {pathname
+              .split('/')
+              .filter(Boolean)
+              .map((part, index) => (
+                <span key={index}>
+                  {index > 0 && ' / '}
+                  <Link href={`/${pathname.split('/').slice(0, index + 1).join('/')}`} 
+                    className="hover:underline text-brand-dark">
+                      {part.charAt(0).toUpperCase() + part.slice(1)}
+                  </Link>
+                </span>
+              ))}
           </nav>
-          {/* Notifications */}
-          <button
-            onClick={() => setShowNotifications(!showNotifications)}
-            className="py-2 px-4 bg-brand-bronze text-white rounded hover:bg-opacity-90 transition"
-          >
-            Notifications
-          </button>
+          <button onClick={() => setShowNotifications(!showNotifications)}
+            className="py-2 px-4 bg-brand-bronze text-white rounded hover:bg-opacity-90 transition">Notifications</button>
         </header>
-        {/* Notifications Dropdown */}
         {showNotifications && (
           <div className="absolute top-16 right-4 w-64 bg-white shadow-lg rounded-md p-4 z-50">
             <h4 className="font-bold text-brand-dark mb-2">Recent Notifications</h4>

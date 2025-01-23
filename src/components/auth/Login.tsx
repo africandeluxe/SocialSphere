@@ -1,5 +1,4 @@
 'use client'
-
 import { useState, useEffect } from 'react';
 import { supabase } from '../../lib/supabaseClient';
 import { useAuth } from '../../context/AuthContext';
@@ -15,13 +14,16 @@ export default function Login() {
   const router = useRouter();
 
   useEffect(() => {
-    console.log('Auth loading:', authLoading);
-    console.log('Session in Login component:', session);
+    if (authLoading) {
+      console.log('Auth is still loading...');
+    } else {
+      console.log('Auth session:', session);
+    }
   }, [authLoading, session]);
 
   useEffect(() => {
     if (session) {
-      console.log('User is already logged in, redirecting to /dashboard...');
+      console.log('User is logged in. Redirecting to /dashboard...');
       router.replace('/dashboard');
     }
   }, [session, router]);
@@ -38,18 +40,22 @@ export default function Login() {
         password,
       });
 
+      if (error) {
+        console.error('Login failed:', error.message);
+        setError(error.message);
+        return;
+      }
+
       if (data?.session) {
         console.log('Login successful. Session:', data.session);
-        console.log('Document cookies after login attempt:', document.cookie);
+
+        console.log('Document cookies immediately after login:', document.cookie);
 
         setTimeout(() => {
-          console.log('Document cookies after delay:', document.cookie);
+          console.log('Document cookies after 1 second:', document.cookie);
         }, 1000);
 
         router.replace('/dashboard');
-      } else if (error) {
-        console.error('Login error:', error.message);
-        setError(error.message);
       }
     } catch (err) {
       console.error('Unexpected error during login:', err);
@@ -58,6 +64,7 @@ export default function Login() {
       setLoading(false);
     }
   };
+
   if (authLoading) {
     return <div className="flex items-center justify-center min-h-screen">Loading...</div>;
   }
@@ -67,27 +74,34 @@ export default function Login() {
       <div className="w-full lg:w-1/2 flex flex-col justify-center px-10 bg-brand-cream">
         <div className="max-w-md mx-auto">
           <h1 className="text-4xl font-bold text-brand-dark mb-6">Welcome Back</h1>
-          <p className="text-brand-gray mb-8">New to SocialSphere?{' '}
-            <Link href="/signup" className="text-brand-bronze hover:underline">Sign up here</Link>
+          <p className="text-brand-gray mb-8">
+            New to SocialSphere?{' '}
+            <Link href="/signup" className="text-brand-bronze hover:underline">
+              Sign up here
+            </Link>
           </p>
 
-          {error && (
-            <p className="text-red-500 bg-red-100 p-3 rounded-lg mb-4">{error}</p>
-          )}
+          {error && <p className="text-red-500 bg-red-100 p-3 rounded-lg mb-4">{error}</p>}
+
           <form onSubmit={(e) => {
               e.preventDefault();
               if (!loading) handleLogin();
             }}>
             <div className="mb-4">
-              <label htmlFor="email" className="block text-brand-dark mb-2">Email Address</label>
+              <label htmlFor="email" className="block text-brand-dark mb-2">
+                Email Address
+              </label>
               <input type="email" id="email" placeholder="john.doe@example.com" value={email} onChange={(e) => setEmail(e.target.value)}
-                className="w-full px-4 py-2 border border-brand-gray rounded-lg focus:outline-none focus:border-brand-bronze" required />
+                className="w-full px-4 py-2 border border-brand-gray rounded-lg focus:outline-none focus:border-brand-bronze"
+                required/>
             </div>
             <div className="mb-6">
-              <label htmlFor="password" className="block text-brand-dark mb-2"> Password</label>
-              <input type="password" id="password" placeholder="********" value={password} onChange={(e) => setPassword(e.target.value)}
-                className="w-full px-4 py-2 border border-brand-gray rounded-lg focus:outline-none focus:border-brand-bronze"
-                required />
+              <label htmlFor="password" className="block text-brand-dark mb-2">
+                Password
+              </label>
+              <input type="password" id="password" placeholder="********" value={password}
+                onChange={(e) => setPassword(e.target.value)}
+                className="w-full px-4 py-2 border border-brand-gray rounded-lg focus:outline-none focus:border-brand-bronze" required/>
             </div>
             <button type="submit" className={`w-full py-2 bg-brand-bronze text-white rounded-lg hover:bg-opacity-90 transition ${
                 loading ? 'opacity-50 cursor-not-allowed' : ''
@@ -98,8 +112,10 @@ export default function Login() {
           </form>
         </div>
       </div>
-      <div className="hidden lg:block w-1/2 bg-cover bg-center" style={{ backgroundImage: 'url(/Login-Dashboard.jpg)' }}>
-      </div>
+      <div
+        className="hidden lg:block w-1/2 bg-cover bg-center"
+        style={{ backgroundImage: 'url(/Login-Dashboard.jpg)' }}>
+        </div>
     </div>
   );
 }
