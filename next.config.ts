@@ -9,7 +9,6 @@ const nextConfig: NextConfig = {
     NEXT_PUBLIC_SUPABASE_ANON_KEY: process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY,
   },
   reactStrictMode: true,
-  swcMinify: true,
 };
 
 export default nextConfig;
