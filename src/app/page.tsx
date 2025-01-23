@@ -1,8 +1,8 @@
-import Navbar from '@/components/Navbar';
-import Hero from '@/components/Hero';
-import WhatWeAre from '@/components/WhatWeAre';
-import Features from '@/components/Features';
-import Footer from '@/components/Footer';
+import Navbar from '../components/common/Navbar';
+import Hero from '../components/common/Hero';
+import WhatWeAre from '../components/common/WhatWeAre';
+import Features from '../components/common/Features';
+import Footer from '../components/common/Footer';
 
 export default function HomePage() {
   return (

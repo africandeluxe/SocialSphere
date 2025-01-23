@@ -1,7 +1,7 @@
 'use client'
 import { useState, useEffect } from 'react';
-import { supabase } from '@/lib/supabaseClient';
-import DashboardLayout from '@/components/DashboardLayout';
+import { supabase } from '../../../lib/supabaseClient';
+import DashboardLayout from '../../../components/dashboard/DashboardLayout';
 
 export default function ContentManagementPage() {
   const [posts, setPosts] = useState([]);

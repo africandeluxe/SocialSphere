@@ -1,8 +1,8 @@
 'use client'
 import { useState, useEffect } from 'react';
-import { supabase } from '@/lib/supabaseClient';
-import DashboardLayout from '@/components/DashboardLayout';
-import Chart from '@/components/Chart';
+import { supabase } from '../../../lib/supabaseClient';
+import DashboardLayout from '../../../components/dashboard/DashboardLayout';
+import Chart from '../../../components/dashboard/Chart';
 
 export default function AnalyticsPage() {
   const [metrics, setMetrics] = useState({
