@@ -4,6 +4,7 @@ import Calendar from 'react-calendar';
 import 'react-calendar/dist/Calendar.css';
 import dayjs from 'dayjs';
 import { supabase } from '../../lib/supabaseClient';
+
 interface ContentPlan {
   id: number;
   title: string;
@@ -20,16 +21,14 @@ export default function ContentCalendar() {
   useEffect(() => {
     const fetchContent = async () => {
       try {
-        const { data, error } = await supabase
-          .from<ContentPlan>('content_plans')
-          .select('*');
+        const { data, error } = await supabase.from('content_plans').select('*');
 
         console.log('Data:', data);
         console.log('Error:', error);
 
         if (error) throw error;
 
-        setContentList(data || []);
+        setContentList((data as ContentPlan[]) || []);
       } catch (err) {
         console.error('Error fetching content:', err);
       }
@@ -53,7 +52,7 @@ export default function ContentCalendar() {
       if (error) throw error;
 
       if (data) {
-        setContentList((prev) => [...prev, ...data]);
+        setContentList((prev) => [...prev, ...(data as ContentPlan[])]);
         setNewContent({ title: '', platform: '' });
         setSelectedDate(null);
       }
@@ -67,18 +66,26 @@ export default function ContentCalendar() {
       <h1 className="text-2xl font-bold mb-4 text-center">Content Planner</h1>
       <div className="flex flex-col lg:flex-row gap-8">
         <div className="w-full lg:w-1/2">
-          <Calendar onChange={(date) => setSelectedDate(dayjs(date).format('YYYY-MM-DD'))} value={currentDate}
+          <Calendar
+            onChange={(date) => {
+              if (date instanceof Date) {
+                setSelectedDate(dayjs(date).format('YYYY-MM-DD'));
+              } else if (Array.isArray(date) && date[0] instanceof Date) {
+                setSelectedDate(dayjs(date[0]).format('YYYY-MM-DD'));
+              } else {
+                setSelectedDate(null);
+              }
+            }}
+            value={currentDate}
             tileContent={({ date }) =>
               contentList.some((item) => item.date === dayjs(date).format('YYYY-MM-DD')) ? (
                 <div className="text-xs text-center text-brand-bronze">Planned</div>
               ) : null
-            }
-          />
+            }/>
         </div>
         <div className="w-full lg:w-1/2">
           <h2 className="text-lg font-semibold mb-4">Add New Content</h2>
-          <input type="text" placeholder="Title" value={newContent.title}
-            onChange={(e) => setNewContent({ ...newContent, title: e.target.value })}
+          <input type="text" placeholder="Title" value={newContent.title} onChange={(e) => setNewContent({ ...newContent, title: e.target.value })}
             className="w-full p-2 border rounded-md mb-4"/>
           <select value={newContent.platform}
             onChange={(e) => setNewContent({ ...newContent, platform: e.target.value })}
@@ -88,7 +95,8 @@ export default function ContentCalendar() {
             <option value="TikTok">TikTok</option>
           </select>
           <button onClick={addContent}
-            className="px-4 py-2 bg-brand-bronze text-white rounded-md hover:bg-brand-dark">Add Content</button>
+            className="px-4 py-2 bg-brand-bronze text-white rounded-md hover:bg-brand-dark">Add Content
+          </button>
         </div>
       </div>
       <div className="mt-6">

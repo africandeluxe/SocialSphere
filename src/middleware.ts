@@ -1,4 +1,4 @@
-/*import { createMiddlewareClient } from '@supabase/auth-helpers-nextjs';
+import { createMiddlewareClient } from '@supabase/auth-helpers-nextjs';
 import { NextResponse } from 'next/server';
 import type { NextRequest } from 'next/server';
 
@@ -9,11 +9,11 @@ export async function middleware(req: NextRequest) {
 
   const supabase = createMiddlewareClient({ req, res }, {
     cookieOptions: {
-      name: 'sb-auth-token', // Cookie name for Supabase
-      sameSite: 'Lax', // Lax for cross-site requests
-      secure: isProduction, // Secure cookies in production
-      path: '/', // Ensure path is set for the entire site
-      domain: isProduction ? process.env.COOKIE_DOMAIN : undefined, // Set domain in production
+      name: 'sb-auth-token',
+      sameSite: 'Lax',
+      secure: isProduction,
+      path: '/',
+      domain: isProduction ? process.env.COOKIE_DOMAIN : undefined,
     },
   });
 
@@ -35,9 +35,9 @@ export async function middleware(req: NextRequest) {
 
 export const config = {
   matcher: ['/dashboard/:path*', '/profile', '/protected-route'],
-};*/
+};
 
-import { NextResponse } from 'next/server';
+/*import { NextResponse } from 'next/server';
 import type { NextRequest } from 'next/server';
 
 export async function middleware(req: NextRequest) {
@@ -47,4 +47,4 @@ export async function middleware(req: NextRequest) {
 
 export const config = {
   matcher: ['/dashboard/:path*', '/profile', '/protected-route'],
-};
+};*/
