@@ -5,8 +5,27 @@ import DashboardLayout from '../../../components/dashboard/DashboardLayout';
 import Chart from '../../../components/dashboard/Chart';
 import ContentCalendar from '../../../components/dashboard/ContentCalendar';
 
+// Define the type for a single post
+type Post = {
+  id: string; // Assuming IDs are strings; change to `number` if needed
+  content: string;
+  likes: number;
+};
+
+// Define the type for the metrics object
+type Metrics = {
+  instagramEngagements: number;
+  tiktokEngagements: number;
+  instagramFollowers: number[];
+  tiktokFollowers: number[];
+  recentPosts: Post[];
+  instagramGrowth: number[];
+  tiktokGrowth: number[];
+};
+
 export default function DashboardOverview() {
-  const [metrics, setMetrics] = useState({
+  // Use the Metrics type for the state
+  const [metrics, setMetrics] = useState<Metrics>({
     instagramEngagements: 0,
     tiktokEngagements: 0,
     instagramFollowers: [],
@@ -15,6 +34,7 @@ export default function DashboardOverview() {
     instagramGrowth: [],
     tiktokGrowth: [],
   });
+
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
