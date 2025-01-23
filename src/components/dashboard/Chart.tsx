@@ -67,7 +67,7 @@ export default function Chart({ data, showLegend = true }: ChartProps) {
         position: 'top' as const,
         labels: {
           font: {
-            size: 14,
+            size: 12,
           },
         },
       },
@@ -85,12 +85,12 @@ export default function Chart({ data, showLegend = true }: ChartProps) {
           display: true,
           text: 'Weeks',
           font: {
-            size: 14,
+            size: 12,
           },
         },
         ticks: {
           font: {
-            size: 12,
+            size: 10,
           },
         },
       },
@@ -99,13 +99,13 @@ export default function Chart({ data, showLegend = true }: ChartProps) {
           display: true,
           text: 'Followers Gained',
           font: {
-            size: 14,
+            size: 12,
           },
         },
         ticks: {
           beginAtZero: true,
           font: {
-            size: 12,
+            size: 10,
           },
         },
       },
@@ -113,7 +113,7 @@ export default function Chart({ data, showLegend = true }: ChartProps) {
   };
 
   return (
-    <div className="relative w-full h-[300px]">
+    <div className="relative w-full h-[300px] md:h-[400px] lg:h-[500px]">
       <Line data={chartData} options={options} />
     </div>
   );

@@ -1,8 +1,10 @@
-'use client'
+'use client';
+
 import { useState, useEffect } from 'react';
 import { supabase } from '../../../lib/supabaseClient';
 import DashboardLayout from '../../../components/dashboard/DashboardLayout';
 import Chart from '../../../components/dashboard/Chart';
+import ContentCalendar from '../../../components/dashboard/ContentCalendar';
 
 export default function DashboardOverview() {
   const [metrics, setMetrics] = useState({
@@ -39,8 +41,8 @@ export default function DashboardOverview() {
         if (engagementError || audienceError || postsError) {
           throw new Error(
             engagementError?.message ||
-            audienceError?.message ||
-            postsError?.message
+              audienceError?.message ||
+              postsError?.message
           );
         }
 
@@ -105,50 +107,54 @@ export default function DashboardOverview() {
 
       {error && <p className="text-red-500">{error}</p>}
 
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mt-6">
-        <div className="bg-white p-6 rounded shadow-lg">
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 mt-6">
+        <div className="bg-white p-4 sm:p-6 rounded shadow-lg">
           <h3 className="text-lg font-bold text-brand-dark">Instagram Engagement Overview</h3>
           <p className="text-brand-gray mt-2">
             Total Instagram engagements: {metrics.instagramEngagements}
           </p>
         </div>
-        <div className="bg-white p-6 rounded shadow-lg">
+        <div className="bg-white p-4 sm:p-6 rounded shadow-lg">
           <h3 className="text-lg font-bold text-brand-dark">TikTok Engagement Overview</h3>
           <p className="text-brand-gray mt-2">
             Total TikTok engagements: {metrics.tiktokEngagements}
           </p>
         </div>
-        <div className="bg-white p-6 rounded shadow-lg">
+        <div className="bg-white p-4 sm:p-6 rounded shadow-lg">
           <h3 className="text-lg font-bold text-brand-dark">Instagram Audience Growth</h3>
           <p className="text-brand-gray mt-2">
             New Instagram followers this month: {metrics.instagramFollowers.reduce((a, b) => a + b, 0)}
           </p>
         </div>
-        <div className="bg-white p-6 rounded shadow-lg">
+        <div className="bg-white p-4 sm:p-6 rounded shadow-lg">
           <h3 className="text-lg font-bold text-brand-dark">TikTok Audience Growth</h3>
           <p className="text-brand-gray mt-2">
             New TikTok followers this month: {metrics.tiktokFollowers.reduce((a, b) => a + b, 0)}
           </p>
         </div>
-        <div className="bg-white p-6 rounded shadow-lg">
+        <div className="bg-white p-4 sm:p-6 rounded shadow-lg">
           <h3 className="text-lg font-bold text-brand-dark">Recent Posts</h3>
-          <ul className="text-brand-gray mt-2">
+          <ul className="text-brand-gray mt-2 space-y-2">
             {metrics.recentPosts.map((post, index) => (
               <li key={post.id || index}>
                 {post.content} - {post.likes} likes
-                </li>
-              ))}
-              </ul>
-              </div>
+              </li>
+            ))}
+          </ul>
+        </div>
       </div>
+
       <div className="mt-6 space-y-6">
-        <div className="bg-white p-6 rounded shadow-lg">
+        <div className="bg-white p-4 sm:p-6 rounded shadow-lg">
           <h3 className="text-lg font-bold text-brand-dark">Follower Growth Trend</h3>
-          <Chart data={{
+          <Chart
+            data={{
               instagram: metrics.instagramGrowth,
               tiktok: metrics.tiktokGrowth,
-            }}/>
+            }}
+          />
         </div>
+        <ContentCalendar />
       </div>
     </DashboardLayout>
   );

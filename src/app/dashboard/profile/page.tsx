@@ -119,55 +119,82 @@ export default function ProfilePage() {
   }
 
   return (
-    <div className="p-6 bg-white rounded shadow-lg max-w-md mx-auto">
-      <h1 className="text-2xl font-bold mb-6">Profile</h1>
-      <form onSubmit={handleUpdate} className="space-y-4">
+    <div className="p-4 sm:p-6 md:p-8 bg-white rounded shadow-lg max-w-lg md:max-w-2xl mx-auto">
+      <h1 className="text-2xl md:text-3xl font-bold mb-6 text-center">Profile</h1>
+      <form onSubmit={handleUpdate} className="space-y-6">
         {error && <p className="text-red-500">{error}</p>}
         {successMessage && <p className="text-green-500">{successMessage}</p>}
         <div>
           <label htmlFor="name" className="block text-sm font-medium text-gray-700">
             Full Name
           </label>
-          <input type="text" id="name" value={profile.name}
+          <input
+            type="text"
+            id="name"
+            value={profile.name}
             onChange={(e) => setProfile({ ...profile, name: e.target.value })}
-            className="mt-1 block w-full border border-gray-300 rounded-md shadow-sm p-2" required/>
+            className="mt-1 block w-full border border-gray-300 rounded-md shadow-sm p-2"
+            required
+          />
         </div>
         <div>
           <label htmlFor="email" className="block text-sm font-medium text-gray-700">
             Email Address (Read-Only)
           </label>
-          <input type="email" id="email" value={profile.email} readOnly
-            className="mt-1 block w-full border border-gray-300 rounded-md shadow-sm p-2 bg-gray-100"/>
+          <input
+            type="email"
+            id="email"
+            value={profile.email}
+            readOnly
+            className="mt-1 block w-full border border-gray-300 rounded-md shadow-sm p-2 bg-gray-100"
+          />
         </div>
         <div>
           <label htmlFor="bio" className="block text-sm font-medium text-gray-700">
             Bio
           </label>
-          <textarea id="bio" value={profile.bio} onChange={(e) => setProfile({ ...profile, bio: e.target.value })} className="mt-1 block w-full border border-gray-300 rounded-md shadow-sm p-2"rows={4}>
-          </textarea>
+          <textarea
+            id="bio"
+            value={profile.bio}
+            onChange={(e) => setProfile({ ...profile, bio: e.target.value })}
+            className="mt-1 block w-full border border-gray-300 rounded-md shadow-sm p-2"
+            rows={4}
+          ></textarea>
         </div>
         <div>
           <label htmlFor="avatar" className="block text-sm font-medium text-gray-700">
             Profile Picture
           </label>
-          <input type="file" id="avatar" accept="image/*" onChange={(e) => setFile(e.target.files?.[0] || null)}
-            className="mt-1 block w-full text-sm text-gray-500 file:py-2 file:px-4 file:rounded file:border-0 file:text-sm file:font-semibold file:bg-blue-600 file:text-white hover:file:bg-blue-700"/>
+          <input
+            type="file"
+            id="avatar"
+            accept="image/*"
+            onChange={(e) => setFile(e.target.files?.[0] || null)}
+            className="mt-1 block w-full text-sm text-gray-500 file:py-2 file:px-4 file:rounded file:border-0 file:text-sm file:font-semibold file:bg-blue-600 file:text-white hover:file:bg-blue-700"
+          />
           {profile.avatar_url && (
-            <div className="mt-4">
-              <img src={profile.avatar_url} alt="Profile Avatar" className="w-32 h-32 rounded-full shadow-md" />
+            <div className="mt-4 flex justify-center">
+              <img
+                src={profile.avatar_url}
+                alt="Profile Avatar"
+                className="w-24 h-24 sm:w-32 sm:h-32 rounded-full shadow-md"
+              />
             </div>
           )}
         </div>
-        <button type="submit" className="w-full py-2 px-4 bg-blue-600 text-white rounded-lg hover:bg-blue-700">
-            Update Profile
+        <button
+          type="submit"
+          className="w-full py-2 px-4 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition"
+        >
+          Update Profile
         </button>
       </form>
-      <div className="mt-6">
+      <div className="mt-8">
         <h2 className="text-xl font-bold mb-4">Connected Social Accounts</h2>
         {socialAccounts.length > 0 ? (
-          <ul className="list-disc pl-5">
+          <ul className="list-disc pl-5 space-y-2">
             {socialAccounts.map((account, index) => (
-              <li key={index}>
+              <li key={index} className="text-sm">
                 <span className="font-medium">{account.platform}:</span> {account.username}
               </li>
             ))}

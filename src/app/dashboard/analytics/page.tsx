@@ -71,12 +71,12 @@ export default function AnalyticsPage() {
 
   return (
     <DashboardLayout>
-      <h1 className="text-2xl font-bold mb-6">Analytics</h1>
+      <h1 className="text-xl sm:text-2xl lg:text-3xl font-bold mb-4 lg:mb-6">Analytics</h1>
 
       {error && <p className="text-red-500">{error}</p>}
 
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-        <div className="bg-white p-6 rounded shadow-lg">
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 lg:gap-6">
+        <div className="bg-white p-4 lg:p-6 rounded shadow-lg">
           <h3 className="text-lg font-bold text-brand-dark">Top Performing Posts</h3>
           <ul className="text-brand-gray mt-2">
             {metrics.topPosts.map((post) => (
@@ -88,27 +88,33 @@ export default function AnalyticsPage() {
         </div>
       </div>
 
-      <div className="mt-6 space-y-6">
-        <div className="bg-white p-6 rounded shadow-lg">
+      <div className="mt-4 lg:mt-6 space-y-4 lg:space-y-6">
+        <div className="bg-white p-4 lg:p-6 rounded shadow-lg">
           <h3 className="text-lg font-bold text-brand-dark">Follower Growth Trend</h3>
-          <Chart data={{
+          <Chart
+            data={{
               instagram: metrics.instagramGrowth.flat(),
               tiktok: metrics.tiktokGrowth.flat(),
-            }}/>
+            }}
+          />
         </div>
-        <div className="bg-white p-6 rounded shadow-lg">
+        <div className="bg-white p-4 lg:p-6 rounded shadow-lg">
           <h3 className="text-lg font-bold text-brand-dark">Instagram Growth</h3>
-          <Chart data={{
+          <Chart
+            data={{
               instagram: metrics.instagramGrowth.flat(),
             }}
-            showLegend={false}/>
+            showLegend={false}
+          />
         </div>
-        <div className="bg-white p-6 rounded shadow-lg">
+        <div className="bg-white p-4 lg:p-6 rounded shadow-lg">
           <h3 className="text-lg font-bold text-brand-dark">TikTok Growth</h3>
-          <Chart data={{
+          <Chart
+            data={{
               tiktok: metrics.tiktokGrowth.flat(),
             }}
-            showLegend={false}/>
+            showLegend={false}
+          />
         </div>
       </div>
     </DashboardLayout>
