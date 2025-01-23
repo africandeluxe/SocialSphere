@@ -34,7 +34,7 @@ export default function AnalyticsPage() {
         const { data: posts, error: postsError } = await supabase
           .from('posts')
           .select('*')
-          .order('likes', { descending: true })
+          .order('likes', { ascending: false })
           .limit(3);
 
         if (instagramError || tiktokError || postsError) {
